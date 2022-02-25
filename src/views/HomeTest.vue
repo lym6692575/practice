@@ -45,12 +45,19 @@ export default {
 
   created() {
     // 全局监听键盘按下事件
-    var _this = this;
+    // var _this = this;
     document.onkeydown = function (e) {
-      console.log(e); // 取到按下的具体键
-      let key = window.event.keyCode; // 根据不同按键实现不同的功能
-      console.log(key);
-      _this.changePosition(key);
+      // console.log(e); // 取到按下的具体键
+      // let key = window.event.keyCode; // 根据不同按键实现不同的功能
+      // console.log(key);
+      // _this.changePosition(key);
+      document.onkeydown = function (e) {
+        //console.log(e.ctrlKey);
+        let key = window.event.keyCode;
+        if (13 == e.key && e.ctrlKey) {
+          console.log("go");
+        }
+      };
     };
   },
 };
