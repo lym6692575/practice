@@ -12,11 +12,33 @@ export default {
     return {
       topVar: "50%",
       leftVar: "50%",
+      // 监听数组
       keyCodeArry: [],
     };
   },
 
   methods: {
+    // 全局监听键盘事件
+    keyboardWatcher() {
+      var _this = this;
+
+      // 键盘按下
+      document.onkeydown = function (e) {
+        let oEvent = e || event;
+        let keyCode = oEvent.keyCode;
+        _this.keyCodeArry = _this.addKeyCodeArry(keyCode, _this.keyCodeArry);
+        console.log(_this.keyCodeArry);
+      };
+
+      // 键盘松开
+      document.onkeyup = function (e) {
+        let oEvent = e || event;
+        let keyCode = oEvent.keyCode;
+        _this.keyCodeArry = _this.deletKeyCodeArry(keyCode, _this.keyCodeArry);
+        console.log(_this.keyCodeArry);
+      };
+    },
+
     // 按下增加键盘监听数组keyCodeArry数据
     addKeyCodeArry(num, arr) {
       var check = 0;
@@ -30,6 +52,7 @@ export default {
       }
       return arr;
     },
+
     // 松开键盘清空键盘监听数组keyCodeArry数据
     deletKeyCodeArry(num, arr) {
       for (var i = 0; i < arr.length; i++) {
@@ -42,20 +65,7 @@ export default {
   },
 
   created() {
-    // 全局监听键盘按下事件
-    var _this = this;
-    document.onkeydown = function (e) {
-      let oEvent = e || event;
-      let keyCode = oEvent.keyCode;
-      _this.keyCodeArry = _this.addKeyCodeArry(keyCode, _this.keyCodeArry);
-      console.log(_this.keyCodeArry);
-    };
-    document.onkeyup = function (e) {
-      let oEvent = e || event;
-      let keyCode = oEvent.keyCode;
-      _this.keyCodeArry = _this.deletKeyCodeArry(keyCode, _this.keyCodeArry);
-      console.log(_this.keyCodeArry);
-    };
+    this.keyboardWatcher();
   },
 };
 </script>
