@@ -14,6 +14,11 @@ export default {
       leftVar: "50%",
       // 监听数组
       keyCodeArry: [],
+      // 移动状态
+      moveUp: false,
+      down: false,
+      left: false,
+      right: false,
     };
   },
 
@@ -27,7 +32,6 @@ export default {
         let oEvent = e || event;
         let keyCode = oEvent.keyCode;
         _this.keyCodeArry = _this.addKeyCodeArry(keyCode, _this.keyCodeArry);
-        console.log(_this.keyCodeArry);
       };
 
       // 键盘松开
@@ -35,7 +39,6 @@ export default {
         let oEvent = e || event;
         let keyCode = oEvent.keyCode;
         _this.keyCodeArry = _this.deletKeyCodeArry(keyCode, _this.keyCodeArry);
-        console.log(_this.keyCodeArry);
       };
     },
 
@@ -50,6 +53,7 @@ export default {
       if (check == 0) {
         arr.push(num);
       }
+      console.log(arr);
       return arr;
     },
 
@@ -60,12 +64,49 @@ export default {
           arr.splice(i, 1);
         }
       }
+      console.log(arr);
       return arr;
+    },
+
+    changePosition(arr) {
+      let onChangeArr = arr;
+      console.log(onChangeArr);
+    },
+
+    testMove() {
+      console.log("i am testMove");
+      // let dd = this.moveUp;
     },
   },
 
   created() {
     this.keyboardWatcher();
+  },
+  watch: {
+    keyCodeArry() {
+      let arr = this.keyCodeArry;
+      // 当数组长度为1
+      if (arr.length == 1) {
+        // arr.sort();
+        console.log(arr[0]);
+        let key = arr[0];
+        switch (key) {
+          case 38:
+            this.moveUp = true;
+            console.log(this.moveUp);
+            break;
+
+          default:
+            break;
+        }
+      } else if (arr.length == 0) {
+        this.moveUp = false;
+      }
+    },
+
+    moveUp() {
+      this.testMove();
+    },
   },
 };
 </script>
