@@ -72,11 +72,6 @@ export default {
       let onChangeArr = arr;
       console.log(onChangeArr);
     },
-
-    testMove() {
-      console.log("i am testMove");
-      // let dd = this.moveUp;
-    },
   },
 
   created() {
@@ -101,11 +96,14 @@ export default {
         }
       } else if (arr.length == 0) {
         this.moveUp = false;
+        console.log(this.moveUp);
       }
     },
 
     moveUp() {
-      this.testMove();
+      while (this.moveUp == true) {
+        console.log("1");
+      }
     },
   },
 };
