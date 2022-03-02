@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container bg-black">
     <div :style="{ '--top': topVar, '--left': leftVar }" class="test-div"></div>
   </div>
 </template>
@@ -12,97 +12,66 @@ export default {
     return {
       topVar: "50%",
       leftVar: "50%",
-      // 监听数组
-      keyCodeArry: [],
-      // 移动状态
-      moveUp: false,
-      down: false,
-      left: false,
-      right: false,
+      key_pressed: {
+        setUp: false,
+        setDown: false,
+        setLeft: false,
+        setRight: false,
+      },
     };
   },
 
   methods: {
-    // 全局监听键盘事件
-    keyboardWatcher() {
-      var _this = this;
-
-      // 键盘按下
-      document.onkeydown = function (e) {
-        let oEvent = e || event;
-        let keyCode = oEvent.keyCode;
-        _this.keyCodeArry = _this.addKeyCodeArry(keyCode, _this.keyCodeArry);
-      };
-
-      // 键盘松开
-      document.onkeyup = function (e) {
-        let oEvent = e || event;
-        let keyCode = oEvent.keyCode;
-        _this.keyCodeArry = _this.deletKeyCodeArry(keyCode, _this.keyCodeArry);
-      };
-    },
-
-    // 按下增加键盘监听数组keyCodeArry数据
-    addKeyCodeArry(num, arr) {
-      var check = 0;
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i] == num) {
-          check = 1;
-        }
+    // 键盘按下
+    onkeydown(key) {
+      let topPosition = parseInt(this.topVar),
+        leftPositon = parseInt(this.leftVar);
+      switch (key) {
+        case 40:
+          console.log(topPosition + 1 + "%");
+          this.topVar = topPosition + 1 + "%";
+          break;
+        case 38:
+          console.log(topPosition - 1 + "%");
+          this.topVar = topPosition - 1 + "%";
+          break;
+        case 37:
+          console.log(leftPositon - 1 + "%");
+          this.leftVar = leftPositon - 1 + "%";
+          break;
+        case 39:
+          console.log(leftPositon + 1 + "%");
+          this.leftVar = leftPositon + 1 + "%";
+          break;
+        default:
+          break;
       }
-      if (check == 0) {
-        arr.push(num);
-      }
-      console.log(arr);
-      return arr;
     },
 
-    // 松开键盘清空键盘监听数组keyCodeArry数据
-    deletKeyCodeArry(num, arr) {
-      for (var i = 0; i < arr.length; i++) {
-        if (arr[i] == num) {
-          arr.splice(i, 1);
-        }
-      }
-      console.log(arr);
-      return arr;
-    },
-
-    changePosition(arr) {
-      let onChangeArr = arr;
-      console.log(onChangeArr);
-    },
+    test() {},
   },
 
   created() {
-    this.keyboardWatcher();
+    // 全局监听键盘按下事件
+    var _this = this;
+    document.onkeydown = function (e) {
+      // console.log(e); // 取到按下的具体键
+      let key = e.keyCode; // 根据不同按键实现不同的功能
+      // console.log(key);
+      _this.onkeydown(key);
+    };
   },
   watch: {
-    keyCodeArry() {
-      let arr = this.keyCodeArry;
-      // 当数组长度为1
-      if (arr.length == 1) {
-        // arr.sort();
-        console.log(arr[0]);
-        let key = arr[0];
-        switch (key) {
-          case 38:
-            this.moveUp = true;
-            console.log(this.moveUp);
-            break;
-
-          default:
-            break;
-        }
-      } else if (arr.length == 0) {
-        this.moveUp = false;
-        console.log(this.moveUp);
+    topVar() {
+      let topPosition = parseInt(this.topVar);
+      if (topPosition > 95 || topPosition < 0) {
+        console.log("出界了！");
       }
     },
-
-    moveUp() {
-      while (this.moveUp == true) {
-        console.log("1");
+    leftVar() {
+      let leftPositon = parseInt(this.leftVar);
+      if (leftPositon > 95 || leftPositon < 0) {
+        console.log("出界了！");
       }
     },
   },
@@ -111,10 +80,15 @@ export default {
 
 
 <style>
+.bg-black {
+  background-color: #d9d9d9;
+}
 .container {
   position: relative;
   width: 800px;
   height: 800px;
+  margin: 0% auto;
+  border-radius: 2%;
 }
 .test-div {
   position: absolute;
@@ -122,6 +96,7 @@ export default {
   top: var(--top);
   height: 40px;
   width: 40px;
-  background: red;
+  background: #262626;
+  border-radius: 20%;
 }
 </style>
