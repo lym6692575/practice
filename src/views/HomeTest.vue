@@ -25,10 +25,14 @@ export default {
       mark: [],
       // 方向控制
       key_pressed: {
-        setUp: true,
-        setDown: true,
-        setLeft: true,
-        setRight: true,
+        // up
+        38: true,
+        // down
+        40: true,
+        // left
+        37: true,
+        // right
+        39: true,
       },
       // 存储持续移动的setInterval
       direction: null,
@@ -79,7 +83,8 @@ export default {
     },
 
     // 通过改变direction改变移动方向
-    changePoint(str) {
+    changePoint(e) {
+      let key = e.keyCode;
       let dd = this.key_pressed;
       // 控制方向状态唯一
       for (let key in dd) {
@@ -87,9 +92,10 @@ export default {
           dd[key] = false;
         }
       }
-      dd[str] = true;
-      switch (str) {
-        case "setUp":
+      dd[key] = true;
+      
+      switch (key) {
+        case 38:
           if (this.direction != null) {
             clearInterval(this.direction);
           }
@@ -99,7 +105,7 @@ export default {
             this.record();
           }, 150);
           break;
-        case "setDown":
+        case 40:
           if (this.direction != null) {
             clearInterval(this.direction);
           }
@@ -109,7 +115,7 @@ export default {
             this.record();
           }, 150);
           break;
-        case "setLeft":
+        case 37:
           if (this.direction != null) {
             clearInterval(this.direction);
           }
@@ -119,7 +125,7 @@ export default {
             this.record();
           }, 150);
           break;
-        case "setRight":
+        case 39:
           if (this.direction != null) {
             clearInterval(this.direction);
           }
@@ -133,36 +139,12 @@ export default {
           break;
       }
     },
-
-    // 键盘按下修改移动状态
-    onkeydown(e) {
-      // console.log(e); // 取到按下的具体键
-      let key = e.keyCode; // 根据不同按键实现不同的功能
-      // console.log(key);
-      switch (key) {
-        case 38:
-          this.changePoint("setUp");
-          break;
-        case 40:
-          this.changePoint("setDown");
-          break;
-        case 37:
-          this.changePoint("setLeft");
-          break;
-        case 39:
-          this.changePoint("setRight");
-          break;
-        default:
-          break;
-      }
-    },
   },
 
   created() {
     // 全局监听键盘事件
     var _this = this;
     document.onkeydown = function (e) {
-      _this.onkeydown(e);
       _this.changePoint(e);
     };
   },
