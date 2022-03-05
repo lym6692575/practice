@@ -55,15 +55,14 @@ export default {
       document.getElementById("container").appendChild(newElement); //漏了这一句，否则行不通
       newElement.id = "newDiv";
       newElement.className = "common";
-      newElement.setAttribute("name ", "newDivName");
     },
     // ============我是分割线===============
 
     //初始化
     init() {
       console.log(this.$refs.head.style);
+      this.leftVar = this.$refs.head.style.top = "440px";
       this.topVar = this.$refs.head.style.left = "400px";
-      this.leftVar = this.$refs.head.style.top = "400px";
       console.log("topVar", this.topVar);
       console.log("leftVar", this.leftVar);
       this.record();
@@ -93,7 +92,7 @@ export default {
         }
       }
       dd[key] = true;
-      
+
       switch (key) {
         case 38:
           if (this.direction != null) {
