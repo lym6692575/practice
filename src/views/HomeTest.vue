@@ -1,7 +1,11 @@
 <template>
-  <div class="container bg-black">
-    <button @click="test">点我输出key_pressed</button>
-    <div :style="{ '--top': topVar, '--left': leftVar }" class="test-div"></div>
+  <div id="container" class="container bg-black">
+    <button @click="test">停止移动</button>
+    <button @click="showMark">输出mark</button>
+    <button @click="addDiv">增加</button>
+    <button @click="init">init</button>
+    <div>长度:{{ this.headerState.length }}</div>
+    <div id="head" class="head common" ref="head"></div>
   </div>
 </template>
 
@@ -11,61 +15,142 @@ export default {
   components: {},
   data() {
     return {
-      topVar: "50%",
-      leftVar: "50%",
-      key_pressed: {
-        setUp: false,
-        setDown: false,
-        setLeft: false,
-        setRight: false,
+      // 头的属性
+      headerState: {
+        topVar: "",
+        leftVar: "",
+        length: 1,
       },
+      // 移动历史
+      mark: [],
+      // 方向控制
+      key_pressed: {
+        setUp: true,
+        setDown: true,
+        setLeft: true,
+        setRight: true,
+      },
+      // 存储持续移动的setInterval
+      direction: null,
+
+      // 游戏状态
+      ggState: false,
     };
   },
 
   methods: {
+    // 测试用
     test() {
-      console.log(this.key_pressed);
+      clearInterval(this.direction);
     },
-    // 键盘按下
-    onkeydown(e) {
-      // console.log(e); // 取到按下的具体键
-      let key = e.keyCode; // 根据不同按键实现不同的功能
-      // console.log(key);
-      switch (key) {
-        case 38:
-          this.key_pressed.setUp = true;
+    showMark() {
+      console.log(this.mark);
+    },
+    addDiv() {
+      var newElement = document.createElement("div");
+      document.getElementById("container").appendChild(newElement); //漏了这一句，否则行不通
+      newElement.id = "newDiv";
+      newElement.className = "common";
+      newElement.setAttribute("name ", "newDivName");
+    },
+    // ============我是分割线===============
+
+    //初始化
+    init() {
+      console.log(this.$refs.head.style);
+      this.topVar = this.$refs.head.style.left = "400px";
+      this.leftVar = this.$refs.head.style.top = "400px";
+      console.log("topVar", this.topVar);
+      console.log("leftVar", this.leftVar);
+      this.record();
+    },
+
+    // 记录位置
+    record() {
+      let top = this.$refs.head.style.top;
+      let left = this.$refs.head.style.left;
+      // mark的最大长度以后改,为宽高像素除头部像素
+      if (this.mark.length < 10) {
+        this.mark.push([top, left]);
+      } else {
+        this.mark = this.mark.splice(1);
+        this.mark.push([top, left]);
+      }
+    },
+
+    // 通过改变direction改变移动方向
+    changePoint(str) {
+      let dd = this.key_pressed;
+      // 控制方向状态唯一
+      for (let key in dd) {
+        if (dd[key] == true) {
+          dd[key] = false;
+        }
+      }
+      dd[str] = true;
+      switch (str) {
+        case "setUp":
+          if (this.direction != null) {
+            clearInterval(this.direction);
+          }
+          this.direction = setInterval(() => {
+            this.$refs.head.style.top =
+              parseInt(this.$refs.head.style.top) - 20 + "px";
+            this.record();
+          }, 150);
           break;
-        case 40:
-          this.key_pressed.setDown = true;
+        case "setDown":
+          if (this.direction != null) {
+            clearInterval(this.direction);
+          }
+          this.direction = setInterval(() => {
+            this.$refs.head.style.top =
+              parseInt(this.$refs.head.style.top) + 20 + "px";
+            this.record();
+          }, 150);
           break;
-        case 37:
-          this.key_pressed.setLeft = true;
+        case "setLeft":
+          if (this.direction != null) {
+            clearInterval(this.direction);
+          }
+          this.direction = setInterval(() => {
+            this.$refs.head.style.left =
+              parseInt(this.$refs.head.style.left) - 20 + "px";
+            this.record();
+          }, 150);
           break;
-        case 39:
-          this.key_pressed.setRight = true;
+        case "setRight":
+          if (this.direction != null) {
+            clearInterval(this.direction);
+          }
+          this.direction = setInterval(() => {
+            this.$refs.head.style.left =
+              parseInt(this.$refs.head.style.left) + 20 + "px";
+            this.record();
+          }, 150);
           break;
         default:
           break;
       }
     },
 
-    // 键盘按下
-    onkeyup(e) {
+    // 键盘按下修改移动状态
+    onkeydown(e) {
       // console.log(e); // 取到按下的具体键
       let key = e.keyCode; // 根据不同按键实现不同的功能
       // console.log(key);
       switch (key) {
         case 38:
-          this.key_pressed.setUp = false;
+          this.changePoint("setUp");
           break;
         case 40:
-          this.key_pressed.setDown = false;
+          this.changePoint("setDown");
           break;
         case 37:
-          this.key_pressed.setLeft = false;
+          this.changePoint("setLeft");
           break;
         case 39:
-          this.key_pressed.setRight = false;
+          this.changePoint("setRight");
           break;
         default:
           break;
@@ -78,23 +163,45 @@ export default {
     var _this = this;
     document.onkeydown = function (e) {
       _this.onkeydown(e);
-    };
-    document.onkeyup = function (e) {
-      _this.onkeyup(e);
+      _this.changePoint(e);
     };
   },
   watch: {
-    topVar() {
-      let topPosition = parseInt(this.topVar);
-      if (topPosition > 95 || topPosition < 0) {
-        console.log("出界了！");
-      }
+    // 监听头部状态
+    headerState: {
+      deep: true,
+      handler(newName) {
+        console.log("newName", newName);
+        // 上下移动
+        if (newName.topVar) {
+          if (parseInt(newName.topVar) > 860 || parseInt(newName.topVar) < 0) {
+            this.$refs.head.style.left = "400px";
+            this.ggState = true;
+            debugger;
+          }
+        }
+
+        // 左右移动
+        if (newName.leftPositon) {
+          if (
+            parseInt(newName.leftVar) > 860 ||
+            parseInt(newName.leftVar) < 0
+          ) {
+            this.$refs.head.style.left = "400px";
+            this.ggState = true;
+          }
+        }
+      },
     },
-    leftVar() {
-      let leftPositon = parseInt(this.leftVar);
-      if (leftPositon > 95 || leftPositon < 0) {
-        console.log("出界了！");
-      }
+    ggState: {
+      handler(newName) {
+        if (newName == true) {
+          alert("gg!");
+          this.headerState.topVar = "50%";
+          this.headerState.leftVar = "50%";
+          this.test();
+        }
+      },
     },
   },
 };
@@ -112,10 +219,10 @@ export default {
   margin: 0% auto;
   border-radius: 2%;
 }
-.test-div {
+.common {
   position: absolute;
-  left: var(--left);
-  top: var(--top);
+  left: 0px;
+  top: 0px;
   height: 40px;
   width: 40px;
   background: #262626;
