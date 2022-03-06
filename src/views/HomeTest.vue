@@ -72,10 +72,10 @@ export default {
     //初始化
     init() {
       // console.log(this.$refs.head.style);
-      this.leftVar = this.$refs.head.style.top = "440px";
-      this.topVar = this.$refs.head.style.left = "400px";
-      // console.log("topVar", this.topVar);
-      // console.log("leftVar", this.leftVar);
+      this.headerState.leftVar = this.$refs.head.style.top = "440px";
+      this.headerState.topVar = this.$refs.head.style.left = "400px";
+      console.log("topVar", this.topVar);
+      console.log("leftVar", this.leftVar);
       this.record();
     },
 
@@ -94,7 +94,7 @@ export default {
 
     // 刷新尾巴的位置
     refresh() {
-      // console.log("this is refresh");
+      console.log("this is refresh");
       const length = this.headerState.length;
       const markLength = this.mark.length;
       for (let i = 1; i < length; i++) {
@@ -108,6 +108,8 @@ export default {
         div.style.top = this.mark[markLength - i - 1][0];
         div.style.left = this.mark[markLength - i - 1][1];
       }
+
+      console.log(this.headerState.topVar);
     },
     // 通过改变direction改变移动方向
     changePoint(e) {
@@ -127,8 +129,9 @@ export default {
             clearInterval(this.direction);
           }
           this.direction = setInterval(() => {
-            this.$refs.head.style.top =
+            this.headerState.topVar = this.$refs.head.style.top =
               parseInt(this.$refs.head.style.top) - 40 + "px";
+            // console.log(this.topVar);
             this.record();
             this.refresh();
           }, 150);
@@ -138,7 +141,7 @@ export default {
             clearInterval(this.direction);
           }
           this.direction = setInterval(() => {
-            this.$refs.head.style.top =
+            this.headerState.topVar = this.$refs.head.style.top =
               parseInt(this.$refs.head.style.top) + 40 + "px";
             this.record();
             this.refresh();
@@ -187,11 +190,10 @@ export default {
     headerState: {
       deep: true,
       handler(newName) {
-        // console.log("newName", newName);
+        console.log("newName", newName);
         // 上下移动
         if (newName.topVar) {
           if (parseInt(newName.topVar) > 860 || parseInt(newName.topVar) < 0) {
-            this.$refs.head.style.left = "400px";
             this.ggState = true;
             debugger;
           }
@@ -203,7 +205,6 @@ export default {
             parseInt(newName.leftVar) > 860 ||
             parseInt(newName.leftVar) < 0
           ) {
-            this.$refs.head.style.left = "400px";
             this.ggState = true;
           }
         }
@@ -213,8 +214,8 @@ export default {
       handler(newName) {
         if (newName == true) {
           alert("gg!");
-          this.headerState.topVar = "50%";
-          this.headerState.leftVar = "50%";
+          this.headerState.topVar = this.$refs.head.style.top = "50%";
+          this.headerState.leftVar = this.$refs.head.style.left = "50%";
           this.test();
         }
       },
