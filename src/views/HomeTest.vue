@@ -4,8 +4,9 @@
     <button @click="showMark">输出mark</button>
     <button @click="addDiv">增加</button>
     <button @click="init">init</button>
+    <button @click="refresh">refresh</button>
     <div>长度:{{ this.headerState.length }}</div>
-    <div id="head" class="head common" ref="head"></div>
+    <div id="head" class="head common" ref="head">H</div>
   </div>
 </template>
 
@@ -22,6 +23,7 @@ export default {
         length: 1,
       },
       // 移动历史
+      // 先top 后 left
       mark: [],
       // 方向控制
       key_pressed: {
@@ -51,20 +53,29 @@ export default {
       console.log(this.mark);
     },
     addDiv() {
-      var newElement = document.createElement("div");
+      let newElement = document.createElement("div");
+      let divIndex = this.headerState.length;
       document.getElementById("container").appendChild(newElement); //漏了这一句，否则行不通
-      newElement.id = "newDiv";
+      newElement.id = "newDiv" + divIndex;
       newElement.className = "common";
+      newElement.innerHTML = divIndex;
+      // 新增的div的位置定位
+      if (this.mark) {
+        newElement.style.top = this.mark[this.mark.length - 2][0];
+        newElement.style.left = this.mark[this.mark.length - 2][1];
+      }
+      // 修改length数据
+      this.headerState.length++;
     },
     // ============我是分割线===============
 
     //初始化
     init() {
-      console.log(this.$refs.head.style);
+      // console.log(this.$refs.head.style);
       this.leftVar = this.$refs.head.style.top = "440px";
       this.topVar = this.$refs.head.style.left = "400px";
-      console.log("topVar", this.topVar);
-      console.log("leftVar", this.leftVar);
+      // console.log("topVar", this.topVar);
+      // console.log("leftVar", this.leftVar);
       this.record();
     },
 
@@ -81,6 +92,23 @@ export default {
       }
     },
 
+    // 刷新尾巴的位置
+    refresh() {
+      // console.log("this is refresh");
+      const length = this.headerState.length;
+      const markLength = this.mark.length;
+      for (let i = 1; i < length; i++) {
+        const divname = "newDiv" + i;
+        // console.log(divname);
+        let div = document.getElementById(divname);
+        // console.log(div.style);
+
+        // console.log(markLength - i - 1);
+        // console.log(this.mark[markLength - i - 1]);
+        div.style.top = this.mark[markLength - i - 1][0];
+        div.style.left = this.mark[markLength - i - 1][1];
+      }
+    },
     // 通过改变direction改变移动方向
     changePoint(e) {
       let key = e.keyCode;
@@ -100,8 +128,9 @@ export default {
           }
           this.direction = setInterval(() => {
             this.$refs.head.style.top =
-              parseInt(this.$refs.head.style.top) - 20 + "px";
+              parseInt(this.$refs.head.style.top) - 40 + "px";
             this.record();
+            this.refresh();
           }, 150);
           break;
         case 40:
@@ -110,8 +139,9 @@ export default {
           }
           this.direction = setInterval(() => {
             this.$refs.head.style.top =
-              parseInt(this.$refs.head.style.top) + 20 + "px";
+              parseInt(this.$refs.head.style.top) + 40 + "px";
             this.record();
+            this.refresh();
           }, 150);
           break;
         case 37:
@@ -120,8 +150,9 @@ export default {
           }
           this.direction = setInterval(() => {
             this.$refs.head.style.left =
-              parseInt(this.$refs.head.style.left) - 20 + "px";
+              parseInt(this.$refs.head.style.left) - 40 + "px";
             this.record();
+            this.refresh();
           }, 150);
           break;
         case 39:
@@ -130,8 +161,9 @@ export default {
           }
           this.direction = setInterval(() => {
             this.$refs.head.style.left =
-              parseInt(this.$refs.head.style.left) + 20 + "px";
+              parseInt(this.$refs.head.style.left) + 40 + "px";
             this.record();
+            this.refresh();
           }, 150);
           break;
         default:
@@ -147,12 +179,15 @@ export default {
       _this.changePoint(e);
     };
   },
+  mounted() {
+    this.init();
+  },
   watch: {
     // 监听头部状态
     headerState: {
       deep: true,
       handler(newName) {
-        console.log("newName", newName);
+        // console.log("newName", newName);
         // 上下移动
         if (newName.topVar) {
           if (parseInt(newName.topVar) > 860 || parseInt(newName.topVar) < 0) {
@@ -208,5 +243,9 @@ export default {
   width: 40px;
   background: #262626;
   border-radius: 20%;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 40px;
 }
 </style>
