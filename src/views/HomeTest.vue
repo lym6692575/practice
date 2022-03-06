@@ -4,9 +4,11 @@
     <button @click="showMark">输出mark</button>
     <button @click="addDiv">增加</button>
     <button @click="init">init</button>
-    <button @click="refresh">refresh</button>
     <div>长度:{{ this.headerState.length }}</div>
     <div id="head" class="head common" ref="head">H</div>
+    <div v-for="(item, index) in mark" :key="index">
+      <div :id="'tail' + (index + 1)" class="common"></div>
+    </div>
   </div>
 </template>
 
@@ -52,6 +54,8 @@ export default {
     showMark() {
       console.log(this.mark);
     },
+
+    // 添加div
     addDiv() {
       let newElement = document.createElement("div");
       let divIndex = this.headerState.length;
@@ -77,6 +81,10 @@ export default {
       console.log("topVar", this.topVar);
       console.log("leftVar", this.leftVar);
       this.record();
+      clearInterval(this.direction);
+      this.ggState = false;
+      this.mark = [];
+      // this.cleanTail();
     },
 
     // 记录位置
@@ -111,6 +119,7 @@ export default {
 
       console.log(this.headerState.topVar);
     },
+
     // 通过改变direction改变移动方向
     changePoint(e) {
       let key = e.keyCode;
@@ -152,7 +161,7 @@ export default {
             clearInterval(this.direction);
           }
           this.direction = setInterval(() => {
-            this.$refs.head.style.left =
+            this.headerState.leftVar = this.$refs.head.style.left =
               parseInt(this.$refs.head.style.left) - 40 + "px";
             this.record();
             this.refresh();
@@ -163,7 +172,7 @@ export default {
             clearInterval(this.direction);
           }
           this.direction = setInterval(() => {
-            this.$refs.head.style.left =
+            this.headerState.leftVar = this.$refs.head.style.left =
               parseInt(this.$refs.head.style.left) + 40 + "px";
             this.record();
             this.refresh();
@@ -193,16 +202,15 @@ export default {
         console.log("newName", newName);
         // 上下移动
         if (newName.topVar) {
-          if (parseInt(newName.topVar) > 860 || parseInt(newName.topVar) < 0) {
+          if (parseInt(newName.topVar) > 760 || parseInt(newName.topVar) < 0) {
             this.ggState = true;
-            debugger;
           }
         }
 
         // 左右移动
-        if (newName.leftPositon) {
+        if (newName.leftVar) {
           if (
-            parseInt(newName.leftVar) > 860 ||
+            parseInt(newName.leftVar) > 760 ||
             parseInt(newName.leftVar) < 0
           ) {
             this.ggState = true;
@@ -210,6 +218,8 @@ export default {
         }
       },
     },
+
+    // 观测死亡状态
     ggState: {
       handler(newName) {
         if (newName == true) {
@@ -217,6 +227,7 @@ export default {
           this.headerState.topVar = this.$refs.head.style.top = "50%";
           this.headerState.leftVar = this.$refs.head.style.left = "50%";
           this.test();
+          this.init();
         }
       },
     },
