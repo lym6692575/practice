@@ -2,12 +2,23 @@
   <div id="container" class="container bg-black">
     <button @click="test">停止移动</button>
     <button @click="showMark">输出mark</button>
-    <button @click="addDiv">增加</button>
+    <button @click="addTail">增加尾巴</button>
     <button @click="init">init</button>
     <div>长度:{{ this.headerState.length }}</div>
     <div id="head" class="head common" ref="head">H</div>
     <div v-for="(item, index) in mark" :key="index">
-      <div :id="'tail' + (index + 1)" class="common"></div>
+      <!-- {{ item }},{{ index }},{{ mark.length }}, mark.length-index-1
+      {{ mark.length - index - 1 }} -->
+      <div
+        :id="'tail' + (index + 1)"
+        class="common"
+        :style="{
+          top: mark[mark.length - index - 1][0],
+          left: mark[mark.length - index - 1][1],
+        }"
+      >
+        {{ index }}
+      </div>
     </div>
   </div>
 </template>
@@ -27,16 +38,17 @@ export default {
       // 移动历史
       // 先top 后 left
       mark: [],
+      tail: [],
       // 方向控制
       key_pressed: {
         // up
-        38: true,
+        38: false,
         // down
-        40: true,
+        40: false,
         // left
-        37: true,
+        37: false,
         // right
-        39: true,
+        39: false,
       },
       // 存储持续移动的setInterval
       direction: null,
@@ -56,7 +68,7 @@ export default {
     },
 
     // 添加div
-    addDiv() {
+    addTail() {
       let newElement = document.createElement("div");
       let divIndex = this.headerState.length;
       document.getElementById("container").appendChild(newElement); //漏了这一句，否则行不通
@@ -78,8 +90,6 @@ export default {
       // console.log(this.$refs.head.style);
       this.headerState.leftVar = this.$refs.head.style.top = "440px";
       this.headerState.topVar = this.$refs.head.style.left = "400px";
-      console.log("topVar", this.topVar);
-      console.log("leftVar", this.leftVar);
       this.record();
       clearInterval(this.direction);
       this.ggState = false;
@@ -102,9 +112,8 @@ export default {
 
     // 刷新尾巴的位置
     refresh() {
-      console.log("this is refresh");
-      const length = this.headerState.length;
-      const markLength = this.mark.length;
+      let length = this.headerState.length;
+      let markLength = this.mark.length;
       for (let i = 1; i < length; i++) {
         const divname = "newDiv" + i;
         // console.log(divname);
@@ -116,8 +125,6 @@ export default {
         div.style.top = this.mark[markLength - i - 1][0];
         div.style.left = this.mark[markLength - i - 1][1];
       }
-
-      console.log(this.headerState.topVar);
     },
 
     // 通过改变direction改变移动方向
@@ -125,34 +132,48 @@ export default {
       let key = e.keyCode;
       let dd = this.key_pressed;
       // 控制方向状态唯一
-      for (let key in dd) {
-        if (dd[key] == true) {
-          dd[key] = false;
+      let only = function () {
+        for (let key in dd) {
+          if (dd[key] == true) {
+            dd[key] = false;
+          }
         }
-      }
-      dd[key] = true;
+        dd[key] = true;
+      };
 
+      console.log("before only");
+      console.log("up", dd[38]);
+      console.log("down", dd[40]);
+      // 需要先记录再刷新
       switch (key) {
         case 38:
-          if (this.direction != null) {
-            clearInterval(this.direction);
+          console.log("after only in case 38");
+          console.log("up", dd[38]);
+          console.log("down", dd[40]);
+          if (dd[40] != true) {
+            if (this.direction != null) {
+              clearInterval(this.direction);
+              only();
+            }
+            this.direction = setInterval(() => {
+              this.record();
+              this.headerState.topVar = this.$refs.head.style.top =
+                parseInt(this.$refs.head.style.top) - 40 + "px";
+              this.refresh();
+            }, 150);
           }
-          this.direction = setInterval(() => {
-            this.headerState.topVar = this.$refs.head.style.top =
-              parseInt(this.$refs.head.style.top) - 40 + "px";
-            // console.log(this.topVar);
-            this.record();
-            this.refresh();
-          }, 150);
           break;
         case 40:
+          console.log("after only in case 38");
+          console.log("up", dd[38]);
+          console.log("down", dd[40]);
           if (this.direction != null) {
             clearInterval(this.direction);
           }
           this.direction = setInterval(() => {
+            this.record();
             this.headerState.topVar = this.$refs.head.style.top =
               parseInt(this.$refs.head.style.top) + 40 + "px";
-            this.record();
             this.refresh();
           }, 150);
           break;
@@ -161,9 +182,9 @@ export default {
             clearInterval(this.direction);
           }
           this.direction = setInterval(() => {
+            this.record();
             this.headerState.leftVar = this.$refs.head.style.left =
               parseInt(this.$refs.head.style.left) - 40 + "px";
-            this.record();
             this.refresh();
           }, 150);
           break;
@@ -172,9 +193,9 @@ export default {
             clearInterval(this.direction);
           }
           this.direction = setInterval(() => {
+            this.record();
             this.headerState.leftVar = this.$refs.head.style.left =
               parseInt(this.$refs.head.style.left) + 40 + "px";
-            this.record();
             this.refresh();
           }, 150);
           break;
@@ -199,7 +220,6 @@ export default {
     headerState: {
       deep: true,
       handler(newName) {
-        console.log("newName", newName);
         // 上下移动
         if (newName.topVar) {
           if (parseInt(newName.topVar) > 760 || parseInt(newName.topVar) < 0) {
