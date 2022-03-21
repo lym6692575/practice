@@ -3,6 +3,7 @@
     <button @click="test">停止移动</button>
     <button @click="showMark">输出mark</button>
     <button @click="addTail">增加尾巴</button>
+    <button @click="showkey">showkey</button>
     <button @click="init">init</button>
     <div>长度:{{ this.headerState.length }}</div>
     <div id="head" class="head common" ref="head">H</div>
@@ -66,6 +67,11 @@ export default {
     showMark() {
       console.log(this.mark);
     },
+    showkey() {
+      console.log(this.key_pressed);
+      console.log(this.key_pressed[38]);
+      console.log(this.key_pressed[39]);
+    },
 
     // 添加div
     addTail() {
@@ -94,7 +100,10 @@ export default {
       clearInterval(this.direction);
       this.ggState = false;
       this.mark = [];
-      // this.cleanTail();
+
+      for (let key in this.key_pressed) {
+        this.key_pressed[key] = false;
+      }
     },
 
     // 记录位置
@@ -120,8 +129,6 @@ export default {
         let div = document.getElementById(divname);
         // console.log(div.style);
 
-        // console.log(markLength - i - 1);
-        // console.log(this.mark[markLength - i - 1]);
         div.style.top = this.mark[markLength - i - 1][0];
         div.style.left = this.mark[markLength - i - 1][1];
       }
@@ -130,43 +137,27 @@ export default {
     // 通过改变direction改变移动方向
     changePoint(e) {
       let key = e.keyCode;
-      let dd = this.key_pressed;
-      // 控制方向状态唯一
-      let only = function () {
-        for (let key in dd) {
-          if (dd[key] == true) {
-            dd[key] = false;
-          }
+      // 记录移动状态并确保状态唯一
+      for (let key in this.key_pressed) {
+        if (this.key_pressed[key] == true) {
+          this.key_pressed[key] = false;
         }
-        dd[key] = true;
-      };
-
-      console.log("before only");
-      console.log("up", dd[38]);
-      console.log("down", dd[40]);
+      }
+      this.key_pressed[key] = true;
       // 需要先记录再刷新
       switch (key) {
         case 38:
-          console.log("after only in case 38");
-          console.log("up", dd[38]);
-          console.log("down", dd[40]);
-          if (dd[40] != true) {
-            if (this.direction != null) {
-              clearInterval(this.direction);
-              only();
-            }
-            this.direction = setInterval(() => {
-              this.record();
-              this.headerState.topVar = this.$refs.head.style.top =
-                parseInt(this.$refs.head.style.top) - 40 + "px";
-              this.refresh();
-            }, 150);
+          if (this.direction != null) {
+            clearInterval(this.direction);
           }
+          this.direction = setInterval(() => {
+            this.record();
+            this.headerState.topVar = this.$refs.head.style.top =
+              parseInt(this.$refs.head.style.top) - 40 + "px";
+            this.refresh();
+          }, 150);
           break;
         case 40:
-          console.log("after only in case 38");
-          console.log("up", dd[38]);
-          console.log("down", dd[40]);
           if (this.direction != null) {
             clearInterval(this.direction);
           }
@@ -205,14 +196,21 @@ export default {
     },
   },
 
-  created() {
+  created() {},
+  mounted() {
     // 全局监听键盘事件
     var _this = this;
     document.onkeydown = function (e) {
-      _this.changePoint(e);
+      let currentKey = e.keyCode;
+      console.log(currentKey);
+      if (
+        (currentKey == 37 && _this.key_pressed[39] == false) ||
+        (currentKey == 38 && _this.key_pressed[40] == false) ||
+        (currentKey == 39 && _this.key_pressed[37] == false) ||
+        (currentKey == 40 && _this.key_pressed[38] == false)
+      )
+        _this.changePoint(e);
     };
-  },
-  mounted() {
     this.init();
   },
   watch: {
