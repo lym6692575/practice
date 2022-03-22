@@ -97,20 +97,6 @@ export default {
 
     // 增加尾巴
     addTail() {
-      // 忘了这是啥了
-      // let newElement = document.createElement("div");
-      // let divIndex = this.headerState.length;
-      // document.getElementById("container").appendChild(newElement); //漏了这一句，否则行不通
-      // newElement.id = "newDiv" + divIndex;
-      // newElement.className = "common";
-      // newElement.innerHTML = divIndex;
-      // // 新增的div的位置定位
-      // if (this.mark) {
-      //   newElement.style.top = this.mark[this.mark.length - 2][0];
-      //   newElement.style.left = this.mark[this.mark.length - 2][1];
-      // }
-      // // 修改length数据
-      // this.headerState.length++;
       this.tailMax++;
     },
     // ============我是分割线===============
@@ -124,6 +110,7 @@ export default {
       clearInterval(this.direction);
       this.ggState = false;
       this.mark = [];
+      this.mark.length = 0;
       // 移动状态
       for (let key in this.key_pressed) {
         this.key_pressed[key] = false;
@@ -212,7 +199,6 @@ export default {
     var _this = this;
     document.onkeydown = function (e) {
       let currentKey = e.keyCode;
-      console.log(currentKey);
       if (
         (currentKey == 37 && _this.key_pressed[39] == false) ||
         (currentKey == 38 && _this.key_pressed[40] == false) ||
@@ -243,7 +229,11 @@ export default {
             this.ggState = true;
           }
           // 观测头部是否撞到尾巴
-
+          this.mark.forEach((item) => {
+            if (HX == parseInt(item[0]) && HY == parseInt(item[1])) {
+              this.ggState = true;
+            }
+          });
           // 观测head吃food
           if (HX == FX && HY == FY) {
             this.randomFoodPosition();
