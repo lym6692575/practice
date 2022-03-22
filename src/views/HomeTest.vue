@@ -148,21 +148,6 @@ export default {
         }
       }
     },
-
-    // 刷新尾巴的位置
-    refresh() {
-      let length = this.mark.length;
-      let markLength = this.mark.length;
-      for (let i = 1; i < length; i++) {
-        const divname = "newDiv" + i;
-        // console.log(divname);
-        let div = document.getElementById(divname);
-        // console.log(div.style);
-        div.style.top = this.mark[markLength - i - 1][0];
-        div.style.left = this.mark[markLength - i - 1][1];
-      }
-    },
-
     // 通过改变direction改变移动方向
     changePoint(e) {
       let key = e.keyCode;
@@ -183,7 +168,6 @@ export default {
             this.record();
             this.headerState.X = this.$refs.head.style.top =
               parseInt(this.$refs.head.style.top) - 40 + "px";
-            this.refresh();
           }, 150);
           break;
         case 40:
@@ -194,7 +178,6 @@ export default {
             this.record();
             this.headerState.X = this.$refs.head.style.top =
               parseInt(this.$refs.head.style.top) + 40 + "px";
-            this.refresh();
           }, 150);
           break;
         case 37:
@@ -205,7 +188,6 @@ export default {
             this.record();
             this.headerState.Y = this.$refs.head.style.left =
               parseInt(this.$refs.head.style.left) - 40 + "px";
-            this.refresh();
           }, 150);
           break;
         case 39:
@@ -216,7 +198,6 @@ export default {
             this.record();
             this.headerState.Y = this.$refs.head.style.left =
               parseInt(this.$refs.head.style.left) + 40 + "px";
-            this.refresh();
           }, 150);
           break;
         default:
