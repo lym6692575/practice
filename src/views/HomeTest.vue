@@ -1,16 +1,17 @@
 <template>
   <div id="container" class="container bg-black">
     <button @click="test">停止移动</button>
-    <button @click="showMark">输出mark</button>
     <button @click="addTail">增加尾巴长度</button>
-    <button @click="showkey">showkey</button>
+    <button @click="showheaderState">showheaderState</button>
+    <button @click="showFoodState">showFoodState</button>
+    <button @click="randomFoodPosition">randomFoodPosition</button>
     <button @click="init">init</button>
     <div>长度:{{ this.headerState.length }}</div>
     <!-- 头 -->
     <div id="head" class="common head" ref="head">H</div>
     <!-- 尾巴 -->
     <div v-for="(item, index) in mark" :key="index">
-      {{ item }},{{ index }},{{ mark.length }}, mark.length-index-1
+      {{ item }},{{ index }}, mark.length-index-1
       {{ mark.length - index - 1 }}
       <div
         :id="'tail' + (index + 1)"
@@ -35,8 +36,8 @@ export default {
     return {
       // 头的位置
       headerState: {
-        topVar: "",
-        leftVar: "",
+        X: "",
+        Y: "",
         length: 1,
       },
       // 移动位置历史,先top 后 left
@@ -45,8 +46,8 @@ export default {
       tailMax: 0,
       // 食物的属性
       foodState: {
-        topVar: "",
-        leftVar: "",
+        X: "",
+        Y: "",
       },
       // 方向控制
       key_pressed: {
@@ -75,8 +76,21 @@ export default {
     showMark() {
       console.log(this.mark);
     },
-    showkey() {
-      console.log(this.key_pressed);
+    showheaderState() {
+      console.log(this.headerState);
+    },
+    showFoodState() {
+      console.log(this.foodState);
+    },
+
+    // 刷新food随机位置
+    randomFoodPosition() {
+      let x = parseInt(20 * Math.random());
+      let y = parseInt(20 * Math.random());
+      console.log(x, y);
+
+      this.foodState.X = this.$refs.food.style.top = x * 40 + "px";
+      this.foodState.Y = this.$refs.food.style.left = y * 40 + "px";
     },
 
     // 增加尾巴
@@ -102,8 +116,8 @@ export default {
     //初始化
     init() {
       // 头部
-      this.headerState.leftVar = this.$refs.head.style.top = "440px";
-      this.headerState.topVar = this.$refs.head.style.left = "400px";
+      this.headerState.X = this.$refs.head.style.top = "440px";
+      this.headerState.Y = this.$refs.head.style.left = "400px";
       this.record();
       clearInterval(this.direction);
       this.ggState = false;
@@ -113,8 +127,8 @@ export default {
         this.key_pressed[key] = false;
       }
       // 食物
-      this.foodState.leftVar = this.$refs.food.style.top = "280px";
-      this.foodState.topVar = this.$refs.food.style.left = "280px";
+      this.foodState.X = this.$refs.food.style.top = "280px";
+      this.foodState.Y = this.$refs.food.style.left = "400px";
     },
 
     // 记录位置并实时判断尾巴的最大长度
@@ -123,7 +137,8 @@ export default {
       let left = this.$refs.head.style.left;
       // 当尾巴最大长度!=0，记录坐标位置
       if (this.tailMax != 0) {
-        if (this.mark.length < this.tailMax) {
+        // 尾巴最大长度
+        if (this.mark.length < this.tailMax && this.mark.length <= 10) {
           this.mark.push([top, left]);
         } else {
           this.mark = this.mark.splice(1);
@@ -141,7 +156,6 @@ export default {
         // console.log(divname);
         let div = document.getElementById(divname);
         // console.log(div.style);
-
         div.style.top = this.mark[markLength - i - 1][0];
         div.style.left = this.mark[markLength - i - 1][1];
       }
@@ -165,7 +179,7 @@ export default {
           }
           this.direction = setInterval(() => {
             this.record();
-            this.headerState.topVar = this.$refs.head.style.top =
+            this.headerState.X = this.$refs.head.style.top =
               parseInt(this.$refs.head.style.top) - 40 + "px";
             this.refresh();
           }, 150);
@@ -176,7 +190,7 @@ export default {
           }
           this.direction = setInterval(() => {
             this.record();
-            this.headerState.topVar = this.$refs.head.style.top =
+            this.headerState.X = this.$refs.head.style.top =
               parseInt(this.$refs.head.style.top) + 40 + "px";
             this.refresh();
           }, 150);
@@ -187,7 +201,7 @@ export default {
           }
           this.direction = setInterval(() => {
             this.record();
-            this.headerState.leftVar = this.$refs.head.style.left =
+            this.headerState.Y = this.$refs.head.style.left =
               parseInt(this.$refs.head.style.left) - 40 + "px";
             this.refresh();
           }, 150);
@@ -198,7 +212,7 @@ export default {
           }
           this.direction = setInterval(() => {
             this.record();
-            this.headerState.leftVar = this.$refs.head.style.left =
+            this.headerState.Y = this.$refs.head.style.left =
               parseInt(this.$refs.head.style.left) + 40 + "px";
             this.refresh();
           }, 150);
@@ -231,20 +245,26 @@ export default {
     headerState: {
       deep: true,
       handler(newName) {
-        // 上下移动
-        if (newName.topVar) {
-          if (parseInt(newName.topVar) > 760 || parseInt(newName.topVar) < 0) {
-            this.ggState = true;
-          }
-        }
-
-        // 左右移动
-        if (newName.leftVar) {
+        if (newName) {
+          let HX = parseInt(newName.X);
+          let HY = parseInt(newName.Y);
+          let FX = parseInt(this.foodState.X);
+          let FY = parseInt(this.foodState.Y);
+          // 判断死亡
           if (
-            parseInt(newName.leftVar) > 760 ||
-            parseInt(newName.leftVar) < 0
+            parseInt(HX) > 760 ||
+            parseInt(HX) < 0 ||
+            parseInt(HY) > 760 ||
+            parseInt(HY) < 0
           ) {
             this.ggState = true;
+          }
+          // 观测头部是否撞到尾巴
+
+          // 观测head吃food
+          if (HX == FX && HY == FY) {
+            this.randomFoodPosition();
+            this.addTail();
           }
         }
       },
