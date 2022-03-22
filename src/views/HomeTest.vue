@@ -1,12 +1,13 @@
 <template>
   <div id="container" class="container bg-black">
     <button @click="test">停止移动</button>
+    <button @click="showMark">showMark</button>
     <button @click="addTail">增加尾巴长度</button>
     <button @click="showheaderState">showheaderState</button>
     <button @click="showFoodState">showFoodState</button>
     <button @click="randomFoodPosition">randomFoodPosition</button>
     <button @click="init">init</button>
-    <div>长度:{{ this.headerState.length }}</div>
+    <div>长度:{{ this.mark.length }}</div>
     <!-- 头 -->
     <div id="head" class="common head" ref="head">H</div>
     <!-- 尾巴 -->
@@ -38,7 +39,6 @@ export default {
       headerState: {
         X: "",
         Y: "",
-        length: 1,
       },
       // 移动位置历史,先top 后 left
       mark: [],
@@ -74,7 +74,9 @@ export default {
       clearInterval(this.direction);
     },
     showMark() {
-      console.log(this.mark);
+      this.mark.forEach((e) => {
+        console.log(e);
+      });
     },
     showheaderState() {
       console.log(this.headerState);
@@ -149,7 +151,7 @@ export default {
 
     // 刷新尾巴的位置
     refresh() {
-      let length = this.headerState.length;
+      let length = this.mark.length;
       let markLength = this.mark.length;
       for (let i = 1; i < length; i++) {
         const divname = "newDiv" + i;
