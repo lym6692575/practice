@@ -2,14 +2,16 @@
   <div id="container" class="container bg-black">
     <button @click="test">停止移动</button>
     <button @click="showMark">输出mark</button>
-    <button @click="addTail">增加尾巴</button>
+    <button @click="addTail">增加尾巴长度</button>
     <button @click="showkey">showkey</button>
     <button @click="init">init</button>
     <div>长度:{{ this.headerState.length }}</div>
-    <div id="head" class="head common" ref="head">H</div>
+    <!-- 头 -->
+    <div id="head" class="common head" ref="head">H</div>
+    <!-- 尾巴 -->
     <div v-for="(item, index) in mark" :key="index">
-      <!-- {{ item }},{{ index }},{{ mark.length }}, mark.length-index-1
-      {{ mark.length - index - 1 }} -->
+      {{ item }},{{ index }},{{ mark.length }}, mark.length-index-1
+      {{ mark.length - index - 1 }}
       <div
         :id="'tail' + (index + 1)"
         class="common"
@@ -21,6 +23,7 @@
         {{ index }}
       </div>
     </div>
+    <div id="food" class="common food" ref="food">F</div>
   </div>
 </template>
 
@@ -30,16 +33,21 @@ export default {
   components: {},
   data() {
     return {
-      // 头的属性
+      // 头的位置
       headerState: {
         topVar: "",
         leftVar: "",
         length: 1,
       },
-      // 移动历史
-      // 先top 后 left
+      // 移动位置历史,先top 后 left
       mark: [],
-      tail: [],
+      // 尾巴长度
+      tailMax: 0,
+      // 食物的属性
+      foodState: {
+        topVar: "",
+        leftVar: "",
+      },
       // 方向控制
       key_pressed: {
         // up
@@ -69,53 +77,58 @@ export default {
     },
     showkey() {
       console.log(this.key_pressed);
-      console.log(this.key_pressed[38]);
-      console.log(this.key_pressed[39]);
     },
 
-    // 添加div
+    // 增加尾巴
     addTail() {
-      let newElement = document.createElement("div");
-      let divIndex = this.headerState.length;
-      document.getElementById("container").appendChild(newElement); //漏了这一句，否则行不通
-      newElement.id = "newDiv" + divIndex;
-      newElement.className = "common";
-      newElement.innerHTML = divIndex;
-      // 新增的div的位置定位
-      if (this.mark) {
-        newElement.style.top = this.mark[this.mark.length - 2][0];
-        newElement.style.left = this.mark[this.mark.length - 2][1];
-      }
-      // 修改length数据
-      this.headerState.length++;
+      // 忘了这是啥了
+      // let newElement = document.createElement("div");
+      // let divIndex = this.headerState.length;
+      // document.getElementById("container").appendChild(newElement); //漏了这一句，否则行不通
+      // newElement.id = "newDiv" + divIndex;
+      // newElement.className = "common";
+      // newElement.innerHTML = divIndex;
+      // // 新增的div的位置定位
+      // if (this.mark) {
+      //   newElement.style.top = this.mark[this.mark.length - 2][0];
+      //   newElement.style.left = this.mark[this.mark.length - 2][1];
+      // }
+      // // 修改length数据
+      // this.headerState.length++;
+      this.tailMax++;
     },
     // ============我是分割线===============
 
     //初始化
     init() {
-      // console.log(this.$refs.head.style);
+      // 头部
       this.headerState.leftVar = this.$refs.head.style.top = "440px";
       this.headerState.topVar = this.$refs.head.style.left = "400px";
       this.record();
       clearInterval(this.direction);
       this.ggState = false;
       this.mark = [];
-
+      // 移动状态
       for (let key in this.key_pressed) {
         this.key_pressed[key] = false;
       }
+      // 食物
+      this.foodState.leftVar = this.$refs.food.style.top = "280px";
+      this.foodState.topVar = this.$refs.food.style.left = "280px";
     },
 
-    // 记录位置
+    // 记录位置并实时判断尾巴的最大长度
     record() {
       let top = this.$refs.head.style.top;
       let left = this.$refs.head.style.left;
-      // mark的最大长度以后改,为宽高像素除头部像素
-      if (this.mark.length < 10) {
-        this.mark.push([top, left]);
-      } else {
-        this.mark = this.mark.splice(1);
-        this.mark.push([top, left]);
+      // 当尾巴最大长度!=0，记录坐标位置
+      if (this.tailMax != 0) {
+        if (this.mark.length < this.tailMax) {
+          this.mark.push([top, left]);
+        } else {
+          this.mark = this.mark.splice(1);
+          this.mark.push([top, left]);
+        }
       }
     },
 
@@ -242,9 +255,6 @@ export default {
       handler(newName) {
         if (newName == true) {
           alert("gg!");
-          this.headerState.topVar = this.$refs.head.style.top = "50%";
-          this.headerState.leftVar = this.$refs.head.style.left = "50%";
-          this.test();
           this.init();
         }
       },
@@ -277,5 +287,8 @@ export default {
   font-size: 20px;
   font-weight: 600;
   line-height: 40px;
+}
+.food {
+  background: red;
 }
 </style>
