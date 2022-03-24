@@ -2,12 +2,14 @@
   <div id="container" class="container bg-black">
     <button @click="test">停止移动</button>
     <button @click="showMark">showMark</button>
-    <button @click="addTail">增加尾巴长度</button>
+    <button @click="eatedFood">增加尾巴长度</button>
     <button @click="showheaderState">showheaderState</button>
     <button @click="showFoodState">showFoodState</button>
     <button @click="randomFoodPosition">randomFoodPosition</button>
     <button @click="init">init</button>
-    <div>长度:{{ this.mark.length }}</div>
+    <div>
+      长度:{{ this.mark.length }} 分数:{{ this.score }} 速度:{{ this.speed }}
+    </div>
     <!-- 头 -->
     <div id="head" class="common head" ref="head">H</div>
     <!-- 尾巴 -->
@@ -22,7 +24,6 @@
           left: mark[mark.length - index - 1][1],
         }"
       >
-        {{ index }}
       </div>
     </div>
     <div id="food" class="common food" ref="food">F</div>
@@ -64,6 +65,8 @@ export default {
       direction: null,
 
       // 游戏状态
+      score: 0,
+      speed: 1,
       ggState: false,
     };
   },
@@ -95,9 +98,24 @@ export default {
       this.foodState.Y = this.$refs.food.style.left = y * 40 + "px";
     },
 
-    // 增加尾巴
-    addTail() {
+    // 吃食物
+    eatedFood() {
+      // 增加分数
+      this.score = this.score + 1 * this.speed;
+      // 尾巴增加
       this.tailMax++;
+      // 分数和速度
+      if (this.score > 100) {
+        this.speed = 6;
+      } else if (this.score > 50) {
+        this.speed = 5;
+      } else if (this.score > 30) {
+        this.speed = 4;
+      } else if (this.score > 10) {
+        this.speed = 3;
+      } else if (this.score > 5) {
+        this.speed = 2;
+      }
     },
     // ============我是分割线===============
 
@@ -108,9 +126,15 @@ export default {
       this.headerState.Y = this.$refs.head.style.left = "400px";
       this.record();
       clearInterval(this.direction);
+      // 清除游戏状态
       this.ggState = false;
+      this.score = 0;
+      this.speed = 1;
+      // 清空移动轨迹
       this.mark = [];
       this.mark.length = 0;
+      // 清除尾巴
+      this.tailMax = 0;
       // 移动状态
       for (let key in this.key_pressed) {
         this.key_pressed[key] = false;
@@ -155,7 +179,7 @@ export default {
             this.record();
             this.headerState.X = this.$refs.head.style.top =
               parseInt(this.$refs.head.style.top) - 40 + "px";
-          }, 150);
+          }, 150 / this.speed + 50);
           break;
         case 40:
           if (this.direction != null) {
@@ -165,7 +189,7 @@ export default {
             this.record();
             this.headerState.X = this.$refs.head.style.top =
               parseInt(this.$refs.head.style.top) + 40 + "px";
-          }, 150);
+          }, 150 / this.speed + 50);
           break;
         case 37:
           if (this.direction != null) {
@@ -175,7 +199,7 @@ export default {
             this.record();
             this.headerState.Y = this.$refs.head.style.left =
               parseInt(this.$refs.head.style.left) - 40 + "px";
-          }, 150);
+          }, 150 / this.speed + 50);
           break;
         case 39:
           if (this.direction != null) {
@@ -185,7 +209,7 @@ export default {
             this.record();
             this.headerState.Y = this.$refs.head.style.left =
               parseInt(this.$refs.head.style.left) + 40 + "px";
-          }, 150);
+          }, 150 / this.speed + 50);
           break;
         default:
           break;
@@ -237,7 +261,7 @@ export default {
           // 观测head吃food
           if (HX == FX && HY == FY) {
             this.randomFoodPosition();
-            this.addTail();
+            this.eatedFood();
           }
         }
       },
